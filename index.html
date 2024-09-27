@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NORTH AUTO GROUP - Car Cost Calculator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #222;
+            margin: 0;
+            padding: 20px;
+            color: #fff;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(90deg, #ffdd57, #333);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #222;
+            text-shadow: 2px 2px 5px rgba(255, 255, 255, 0.8);
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            max-width: 1200px;
+            margin: auto;
+        }
+        .calculator, .results {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            width: 100%;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ffdd57;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ffdd57;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 5px;
+            background: #444;
+            color: #fff;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #ffdd57;
+            color: #333;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #ffd100;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #ffdd57;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>NORTH AUTO GROUP</h1>
+</div>
+
+<div class="container">
+    <!-- Car Purchasing Estimated Calculator -->
+    <div class="calculator">
+        <h2>Car Purchasing Calculator</h2>
+
+        <div class="form-group">
+            <label for="sellingPrice">Selling Price (CAD)</label>
+            <input type="number" id="sellingPrice" placeholder="Enter the selling price">
+        </div>
+
+        <div class="form-group">
+            <label for="reverseTaxProvince">Select Province (for Tax)</label>
+            <select id="reverseTaxProvince" onchange="setTransportationCost()">
+                <option value="5">Alberta - 5%</option>
+                <option value="13">Ontario - 13%</option>
+                <option value="14.975">Quebec - 14.975%</option>
+                <option value="15">Nova Scotia - 15%</option>
+                <option value="15">Newfoundland and Labrador - 15%</option>
+                <option value="5">British Columbia - 5%</option>
+                <option value="11">Saskatchewan - 11%</option>
+                <option value="12">Manitoba - 12%</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="reverseBuyerFee">Buyer Fee (CAD, default 450)</label>
+            <input type="number" id="reverseBuyerFee" value="450">
+        </div>
+
+        <div class="form-group">
+            <label for="reverseTransportCost">Transportation Cost (CAD, default 0)</label>
+            <input type="number" id="reverseTransportCost" value="0">
+        </div>
+
+        <div class="form-group">
+            <label for="reverseRegInspectionFee">Registration & Inspection Fee (CAD, default 500)</label>
+            <input type="number" id="reverseRegInspectionFee" value="500">
+        </div>
+
+        <div class="form-group">
+            <label for="reverseOtherExpenses">Additional Expenses (CAD)</label>
+            <input type="number" id="reverseOtherExpenses" placeholder="Enter additional expenses">
+        </div>
+
+        <div class="form-group">
+            <label for="profitAmount">Desired Profit (CAD)</label>
+            <input type="number" id="profitAmount" placeholder="Enter desired profit">
+        </div>
+
+        <button onclick="calculateReverseCost()">Calculate Estimated Purchase Price</button>
+
+        <div class="result" id="reverseResult"></div>
+        <div class="result" id="estimatedLandingPriceResult"></div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Results section for additional calculations -->
+    <div class="results">
+        <h2>Additional Profit Calculations</h2>
+        <div class="result" id="upFrontTax"></div>
+        <div class="result" id="returnOnTax"></div>
+        <div class="result" id="totalProfit"></div>
+    </div>
+</div>
+
+<script>
+    function setTransportationCost() {
+        const province = document.getElementById('reverseTaxProvince').value;
+        let transportCost = 0;
+
+        switch (province) {
+            case "5": // Alberta
+                transportCost = 0;
+                break;
+            case "13": // Ontario
+            case "14.975": // Quebec
+                transportCost = 1500;
+                break;
+            case "15": // Nova Scotia
+            case "15": // Newfoundland
+                transportCost = 2000;
+                break;
+            case "5": // British Columbia
+            case "11": // Saskatchewan
+            case "12": // Manitoba
+                transportCost = 600;
+                break;
+        }
+
+        document.getElementById('reverseTransportCost').value = transportCost;
+    }
+
+    function calculateReverseCost() {
+        const sellingPrice = parseFloat(document.getElementById('sellingPrice').value) || 0;
+        const taxRate = parseFloat(document.getElementById('reverseTaxProvince').value) || 0;
+        const buyerFee = parseFloat(document.getElementById('reverseBuyerFee').value) || 450;
+        const transportCost = parseFloat(document.getElementById('reverseTransportCost').value) || 0;
+        const regInspectionFee = parseFloat(document.getElementById('reverseRegInspectionFee').value) || 500;
+        const otherExpenses = parseFloat(document.getElementById('reverseOtherExpenses').value) || 0;
+        const desiredProfit = parseFloat(document.getElementById('profitAmount').value) || 0;
+
+        // Step 1: Subtract expenses and desired profit from the selling price to calculate X
+        const X = sellingPrice - (regInspectionFee + transportCost + desiredProfit + otherExpenses);
+
+        // Step 2: Use the formula to calculate the Purchasing Price
+        const purchasingPrice = X / (1 + (taxRate / 100));
+
+        // Step 3: Subtract the buyer fee from the calculated Purchasing Price
+        const estimatedPurchasePrice = purchasingPrice - buyerFee;
+
+        // Calculate Up Front Tax
+        const upFrontTax = 0.05 * sellingPrice;
+
+        // Calculate Return on Tax
+        const returnOnTax = taxRate - 5;
+        const returnOnTaxCalculation = (returnOnTax / 100) * purchasingPrice;
+
+        // Calculate Total Profit
+        const totalProfit = upFrontTax + returnOnTaxCalculation + desiredProfit;
+
+        // Calculate Estimated Landing Price
+        const estimatedLandingPrice = estimatedPurchasePrice + buyerFee + 
+            (taxRate / 100) * purchasingPrice + transportCost + 
+            regInspectionFee + otherExpenses;
+
+        // Display the results
+        document.getElementById('reverseResult').innerHTML = `Estimated Purchase Price: CAD ${estimatedPurchasePrice.toFixed(2)}`;
+        document.getElementById('estimatedLandingPriceResult').innerHTML = `Estimated Landing Price: CAD ${estimatedLandingPrice.toFixed(2)}`;
+        document.getElementById('upFrontTax').innerHTML = `Up Front Tax: CAD ${upFrontTax.toFixed(2)}`;
+        document.getElementById('returnOnTax').innerHTML = `Return On Tax: CAD ${returnOnTaxCalculation.toFixed(2)}`;
+        document.getElementById('totalProfit').innerHTML = `Total Profit: CAD ${totalProfit.toFixed(2)}`;
+    }
+</script>
+
+</body>
+</html>
